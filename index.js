@@ -2,17 +2,18 @@ const fs = require('fs')
 const findFiles = require('file-regex')
 const userHome = require('user-home')
 const columnify = require('columnify')
+
 const pattern = '.*history'
 
 module.exports = limit => {
   if (!userHome) {
-    process.exit()
+    process.exit() // eslint-disable-line unicorn/no-process-exit
   }
 
   findFiles(userHome, pattern, (err, files) => {
     if (err) {
       console.error(err.message)
-      process.exit(1)
+      process.exit(1) // eslint-disable-line unicorn/no-process-exit
     }
 
     const data = {
@@ -24,17 +25,17 @@ module.exports = limit => {
 
       try {
         fs.accessSync(path, fs.constants.R_OK)
-        
+
         const content = fs.readFileSync(path).toString()
         const lines = content.split('\n')
 
         lines.forEach(line => {
           const cmd = line.split(';')[1].split(' ')[0]
 
-          data.total = data.total + 1
+          data.total += 1
 
           if (data[cmd]) {
-            data[cmd] = data[cmd] + 1
+            data[cmd] += 1
           } else {
             data[cmd] = 1
           }
@@ -48,11 +49,13 @@ module.exports = limit => {
     const ret = []
     let total
 
-    for (prop in data) {
-      arr.push({
-        cmd: prop,
-        number: data[prop]
-      })
+    for (const prop in data) {
+      if (Object.prototype.hasOwnProperty.call(data, prop)) {
+        arr.push({
+          cmd: prop,
+          number: data[prop]
+        })
+      }
     }
 
     arr.sort((a, b) => {
@@ -63,7 +66,7 @@ module.exports = limit => {
       console.log(
         columnify(data, { columns: ['index', 'cmd', 'number', 'percent'] })
       )
-      process.exit()
+      process.exit() // eslint-disable-line unicorn/no-process-exit
     }
 
     arr.forEach((item, index) => {

@@ -5,7 +5,7 @@ const updateNotifier = require('update-notifier')
 const pkg = require('./package.json')
 const main = require('./')
 
-updateNotifier({pkg}).notify()
+updateNotifier({ pkg }).notify()
 
 const cli = cac()
 
