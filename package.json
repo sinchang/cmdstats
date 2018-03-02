@@ -1,0 +1,35 @@
+{
+  "name": "cmdstats",
+  "version": "0.0.0",
+  "description": "Check the terminal command usage frequency",
+  "repository": {
+    "url": "sinchang/cmdstats",
+    "type": "git"
+  },
+  "main": "index.js",
+  "bin": "cli.js",
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "scripts": {
+    "test": "npm run lint && echo 'no tests!'",
+    "lint": "xo"
+  },
+  "author": "sinchang <sinchangwen@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cac": "^4.0.0",
+    "columnify": "^1.5.4",
+    "file-regex": "^2.3.0",
+    "update-notifier": "^2.3.0",
+    "user-home": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint-config-rem": "^3.0.0",
+    "xo": "^0.18.0"
+  },
+  "xo": {
+    "extends": "rem"
+  }
+}
