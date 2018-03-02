@@ -1,6 +1,6 @@
 {
   "name": "cmdstats",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Check the terminal command usage frequency",
   "repository": {
     "url": "sinchang/cmdstats",
@@ -8,10 +8,7 @@
   },
   "main": "index.js",
   "bin": "cli.js",
-  "files": [
-    "index.js",
-    "cli.js"
-  ],
+  "files": ["index.js", "cli.js"],
   "scripts": {
     "test": "npm run lint && echo 'no tests!'",
     "lint": "xo"
