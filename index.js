@@ -1,36 +1,28 @@
 const fs = require('fs')
-const findFiles = require('file-regex')
 const userHome = require('user-home')
 const columnify = require('columnify')
 
-const pattern = '.*history'
+const files = ['.zsh_history', '.bash_history']
 
 module.exports = limit => {
   if (!userHome) {
     process.exit() // eslint-disable-line unicorn/no-process-exit
   }
 
-  findFiles(userHome, pattern, (err, files) => {
-    if (err) {
-      console.error(err.message)
-      process.exit(1) // eslint-disable-line unicorn/no-process-exit
-    }
+  const data = {
+    total: 0
+  }
 
-    const data = {
-      total: 0
-    }
+  files.forEach(file => {
+    const path = `${userHome}/${file}`
 
-    files.forEach(file => {
-      const path = `${file.dir}/${file.file}`
+    try {
+      const content = fs.readFileSync(path).toString()
+      const lines = content.split('\n')
 
-      try {
-        fs.accessSync(path, fs.constants.R_OK)
-
-        const content = fs.readFileSync(path).toString()
-        const lines = content.split('\n')
-
-        lines.forEach(line => {
-          const cmd = line.split(';')[1].split(' ')[0]
+      lines.forEach(line => {
+        try {
+          const cmd = file.indexOf('zsh') ? line.split(';')[1].split(' ')[0] : line.split(' ')[0]
 
           data.total += 1
 
@@ -39,56 +31,56 @@ module.exports = limit => {
           } else {
             data[cmd] = 1
           }
-        })
-      } catch (err) {
-        return false
-      }
-    })
-
-    const arr = []
-    const ret = []
-    let total
-
-    for (const prop in data) {
-      if (Object.prototype.hasOwnProperty.call(data, prop)) {
-        arr.push({
-          cmd: prop,
-          number: data[prop]
-        })
-      }
-    }
-
-    arr.sort((a, b) => {
-      return b.number - a.number
-    })
-
-    const log = data => {
-      console.log(
-        columnify(data, { columns: ['index', 'cmd', 'number', 'percent'] })
-      )
-      process.exit() // eslint-disable-line unicorn/no-process-exit
-    }
-
-    arr.forEach((item, index) => {
-      if (item.cmd === 'total') {
-        total = item.number
-        return false
-      }
-
-      const percent = (item.number / total * 100).toFixed(5) + '%'
-
-      ret.push({
-        percent,
-        cmd: item.cmd,
-        number: item.number,
-        index
+        } catch (err) {
+        }
       })
+    } catch (err) {
+    }
+  })
 
-      if (index === limit) {
-        log(ret)
-      }
+  const arr = []
+  const ret = []
+  let total
+
+  for (const prop in data) {
+    if (Object.prototype.hasOwnProperty.call(data, prop)) {
+      arr.push({
+        cmd: prop,
+        number: data[prop]
+      })
+    }
+  }
+
+  arr.sort((a, b) => {
+    return b.number - a.number
+  })
+
+  const log = data => {
+    console.log(
+      columnify(data, { columns: ['index', 'cmd', 'number', 'percent'] })
+    )
+    process.exit() // eslint-disable-line unicorn/no-process-exit
+  }
+
+  arr.forEach((item, index) => {
+    if (item.cmd === 'total') {
+      total = item.number
+      return false
+    }
+
+    const percent = (item.number / total * 100).toFixed(5) + '%'
+
+    ret.push({
+      percent,
+      cmd: item.cmd,
+      number: item.number,
+      index
     })
 
-    log(ret)
+    if (index === limit) {
+      log(ret)
+    }
   })
+
+  log(ret)
 }
